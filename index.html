@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moving Rectangle Game</title>
+  <title>Directional Rectangle Game</title>
   <style>
     /* Game area */
     body {
@@ -27,12 +27,12 @@
     /* Rectangle player */
     #player {
       position: absolute;
-      bottom: 20px;
+      top: 50%;
       left: 50%;
       width: 10px;
       height: 15px;
       background-color: black;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
     }
   </style>
 </head>
@@ -44,17 +44,44 @@
   <script>
     const player = document.getElementById("player");
     let playerPositionX = window.innerWidth / 2;
+    let speedX = 0;
+    const maxSpeed = 5;
 
-    // Move player left or right based on key presses
+    // Define LookDirection variable (could be "left" or "right")
+    let LookDirection = "right"; // Default value
+
+    // Keydown and Keyup events to control movement speed
     document.addEventListener("keydown", (event) => {
-      const step = 5; // Adjusts speed
       if (event.key === "a" || event.key === "A") {
-        playerPositionX -= step;
+        speedX = -maxSpeed;
       } else if (event.key === "d" || event.key === "D") {
-        playerPositionX += step;
+        speedX = maxSpeed;
       }
-      player.style.left = `${playerPositionX}px`;
     });
+
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "a" || event.key === "A" || event.key === "d" || event.key === "D") {
+        speedX = 0;
+      }
+    });
+
+    // Function to update player position continuously
+    function update() {
+      playerPositionX += speedX;
+      player.style.left = `${playerPositionX}px`;
+
+      // Keep the player within screen bounds
+      const playerWidth = player.offsetWidth;
+      if (playerPositionX < playerWidth / 2) playerPositionX = playerWidth / 2;
+      if (playerPositionX > window.innerWidth - playerWidth / 2) playerPositionX = window.innerWidth - playerWidth / 2;
+
+      requestAnimationFrame(update); // Loop the update function for smooth animation
+    }
+
+    update(); // Start the animation loop
+
+    // Example usage: setting LookDirection manually (can be used later)
+    // LookDirection = "left"; // This will be used to set where the rectangle is looking
   </script>
 </body>
 </html>
