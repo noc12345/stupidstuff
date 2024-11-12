@@ -1,30 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Button Example</title>
-    <style>
-        /* Basic styling for the button */
-        .my-button {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background-color: #007BFF; /* Bootstrap primary color */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .my-button:hover {
-            background-color: #0056b3; /* Darker shade for hover effect */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moving Rectangle Game</title>
+  <style>
+    /* Game area */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      overflow: hidden;
+    }
+
+    #gameArea {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #222;
+    }
+
+    /* Rectangle player */
+    #player {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      width: 10px;
+      height: 15px;
+      background-color: black;
+      transform: translateX(-50%);
+    }
+  </style>
 </head>
 <body>
+  <div id="gameArea">
+    <div id="player"></div>
+  </div>
 
-    <button class="my-button" onclick="alert('Button clicked!')">Click Me</button>
+  <script>
+    const player = document.getElementById("player");
+    let playerPositionX = window.innerWidth / 2;
 
+    // Move player left or right based on key presses
+    document.addEventListener("keydown", (event) => {
+      const step = 5; // Adjusts speed
+      if (event.key === "a" || event.key === "A") {
+        playerPositionX -= step;
+      } else if (event.key === "d" || event.key === "D") {
+        playerPositionX += step;
+      }
+      player.style.left = `${playerPositionX}px`;
+    });
+  </script>
 </body>
 </html>
-
