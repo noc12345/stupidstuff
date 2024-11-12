@@ -59,7 +59,7 @@
       } else if (event.key === "d" || event.key === "D") {
         speedX = maxSpeed;
       } else if (event.key === "w" || event.key === "W") {
-        speedY = 0; // Stop downward movement when 'W' is pressed
+        speedY -= 0.15; // Stop downward movement when 'W' is pressed
       }
     });
 
