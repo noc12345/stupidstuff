@@ -44,9 +44,11 @@
   <script>
     const player = document.getElementById("player");
     let playerPositionX = window.innerWidth / 2;
+    let playerPositionY = window.innerHeight / 2;  // Y-axis position
     let speedX = 0;
+    let speedY = 0.5;  // Downward movement speed
     const maxSpeed = 5;
-
+    
     // Define LookDirection variable (could be "left" or "right")
     let LookDirection = "right"; // Default value
 
@@ -56,24 +58,35 @@
         speedX = -maxSpeed;
       } else if (event.key === "d" || event.key === "D") {
         speedX = maxSpeed;
+      } else if (event.key === "w" || event.key === "W") {
+        speedY = 0; // Stop downward movement when 'W' is pressed
       }
     });
 
     document.addEventListener("keyup", (event) => {
       if (event.key === "a" || event.key === "A" || event.key === "d" || event.key === "D") {
         speedX = 0;
+      } else if (event.key === "w" || event.key === "W") {
+        speedY = 0.5; // Resume downward movement when 'W' is released
       }
     });
 
     // Function to update player position continuously
     function update() {
       playerPositionX += speedX;
-      player.style.left = `${playerPositionX}px`;
+      playerPositionY += speedY;
 
-      // Keep the player within screen bounds
+      player.style.left = `${playerPositionX}px`;
+      player.style.top = `${playerPositionY}px`;
+
+      // Keep the player within screen bounds (X-axis)
       const playerWidth = player.offsetWidth;
       if (playerPositionX < playerWidth / 2) playerPositionX = playerWidth / 2;
       if (playerPositionX > window.innerWidth - playerWidth / 2) playerPositionX = window.innerWidth - playerWidth / 2;
+
+      // Keep the player within screen bounds (Y-axis)
+      if (playerPositionY < 0) playerPositionY = 0; // Prevent going above the screen
+      if (playerPositionY > window.innerHeight - player.offsetHeight) playerPositionY = window.innerHeight - player.offsetHeight;
 
       requestAnimationFrame(update); // Loop the update function for smooth animation
     }
