@@ -32,7 +32,7 @@
       width: 30px; /* Wider to look more like a car */
       height: 15px;
       background-color: black;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) rotate(0deg); /* Start without rotation */
       transition: transform 0.1s ease-in-out; /* Smooth transition for tilting */
     }
   </style>
@@ -70,7 +70,7 @@
       if (event.key === "a" || event.key === "A" || event.key === "d" || event.key === "D") {
         speedX = 0;
       } else if (event.key === "w" || event.key === "W") {
-        speedY = 0.5; // Resume downward movement
+        speedY += 0.05; // Resume downward movement
       }
     });
 
@@ -82,7 +82,7 @@
       // Apply the tilt effect based on horizontal speed
       if (speedX !== 0) {
         // Tilt in the direction of movement
-        tiltAmount = (speedX / maxSpeed) * tiltSpeed; // Adjust how much it tilts
+        tiltAmount = (Math.abs(speedX) / maxSpeed) * tiltSpeed; // Adjust tilt amount
         if (speedX < 0) {
           player.style.transform = `translate(-50%, -50%) rotate(${tiltAmount}deg)`; // Tilt left
         } else {
