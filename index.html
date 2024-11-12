@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Directional Rectangle Game</title>
+  <title>Directional Rectangle Car Game</title>
   <style>
     /* Game area */
     body {
@@ -24,15 +24,16 @@
       background-color: #222;
     }
 
-    /* Rectangle player */
+    /* Rectangle car */
     #player {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 10px;
+      width: 30px; /* Wider to look more like a car */
       height: 15px;
       background-color: black;
       transform: translate(-50%, -50%);
+      transition: transform 0.1s ease-in-out; /* Smooth transition for tilting */
     }
   </style>
 </head>
@@ -44,13 +45,15 @@
   <script>
     const player = document.getElementById("player");
     let playerPositionX = window.innerWidth / 2;
-    let playerPositionY = window.innerHeight / 2;  // Y-axis position
+    let playerPositionY = window.innerHeight / 2;
     let speedX = 0;
-    let speedY = 0.5;  // Downward movement speed
+    let speedY = 0.5;
     const maxSpeed = 5;
-    
+    const tiltSpeed = 5; // Speed of the tilt effect
+    let tiltAmount = 0; // Initial tilt value
+
     // Define LookDirection variable (could be "left" or "right")
-    let LookDirection = "right"; // Default value
+    let LookDirection = "right";
 
     // Keydown and Keyup events to control movement speed
     document.addEventListener("keydown", (event) => {
@@ -59,7 +62,7 @@
       } else if (event.key === "d" || event.key === "D") {
         speedX = maxSpeed;
       } else if (event.key === "w" || event.key === "W") {
-        speedY -= 0.15; // Stop downward movement when 'W' is pressed
+        speedY -= 0.15; // Reverse downward movement
       }
     });
 
@@ -67,7 +70,7 @@
       if (event.key === "a" || event.key === "A" || event.key === "d" || event.key === "D") {
         speedX = 0;
       } else if (event.key === "w" || event.key === "W") {
-        speedY = 0.5; // Resume downward movement when 'W' is released
+        speedY = 0.5; // Resume downward movement
       }
     });
 
@@ -75,6 +78,19 @@
     function update() {
       playerPositionX += speedX;
       playerPositionY += speedY;
+
+      // Apply the tilt effect based on horizontal speed
+      if (speedX !== 0) {
+        // Tilt in the direction of movement
+        tiltAmount = (speedX / maxSpeed) * tiltSpeed; // Adjust how much it tilts
+        if (speedX < 0) {
+          player.style.transform = `translate(-50%, -50%) rotate(${tiltAmount}deg)`; // Tilt left
+        } else {
+          player.style.transform = `translate(-50%, -50%) rotate(${-tiltAmount}deg)`; // Tilt right
+        }
+      } else {
+        player.style.transform = `translate(-50%, -50%)`; // Reset tilt when not moving
+      }
 
       player.style.left = `${playerPositionX}px`;
       player.style.top = `${playerPositionY}px`;
@@ -85,16 +101,13 @@
       if (playerPositionX > window.innerWidth - playerWidth / 2) playerPositionX = window.innerWidth - playerWidth / 2;
 
       // Keep the player within screen bounds (Y-axis)
-      if (playerPositionY < 0) playerPositionY = 0; // Prevent going above the screen
+      if (playerPositionY < 0) playerPositionY = 0;
       if (playerPositionY > window.innerHeight - player.offsetHeight) playerPositionY = window.innerHeight - player.offsetHeight;
 
       requestAnimationFrame(update); // Loop the update function for smooth animation
     }
 
     update(); // Start the animation loop
-
-    // Example usage: setting LookDirection manually (can be used later)
-    // LookDirection = "left"; // This will be used to set where the rectangle is looking
   </script>
 </body>
 </html>
