@@ -104,7 +104,7 @@
 
       // Apply the tilt effect based on horizontal speed
       if (speedX !== 0) {
-        // Tilt in the direction of movement
+        // Tilt in the correct direction based on movement
         tiltAmount = (Math.abs(speedX) / maxSpeed) * tiltSpeed;
         if (speedX < 0) {
           player.style.transform = `translate(-50%, -50%) rotate(${tiltAmount}deg)`; // Tilt left when moving left
@@ -134,3 +134,4 @@
   </script>
 </body>
 </html>
+
