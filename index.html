@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Directional car game kewl</title>
+  <title>Directional Car Game Kewl</title>
   <style>
     /* Game area */
     body {
@@ -52,41 +52,64 @@
     const tiltSpeed = 5; // Speed of the tilt effect
     let tiltAmount = 0; // Initial tilt value
 
-    // Define LookDirection variable (could be "left" or "right")
-    let LookDirection = "right";
+    // Keep track of which keys are currently pressed
+    const keysPressed = {
+      a: false,
+      d: false,
+      w: false
+    };
 
-    // Keydown and Keyup events to control movement speed
+    // Keydown and Keyup events to track key state changes
     document.addEventListener("keydown", (event) => {
       if (event.key === "a" || event.key === "A") {
-        speedX = -maxSpeed;
+        keysPressed.a = true;
       } else if (event.key === "d" || event.key === "D") {
-        speedX = maxSpeed;
+        keysPressed.d = true;
       } else if (event.key === "w" || event.key === "W") {
-        speedY -= 0.15; // Reverse downward movement
+        keysPressed.w = true;
       }
     });
 
     document.addEventListener("keyup", (event) => {
-      if (event.key === "a" || event.key === "A" || event.key === "d" || event.key === "D") {
-        speedX = 0;
+      if (event.key === "a" || event.key === "A") {
+        keysPressed.a = false;
+      } else if (event.key === "d" || event.key === "D") {
+        keysPressed.d = false;
       } else if (event.key === "w" || event.key === "W") {
-        speedY = 0.5; // Resume downward movement
+        keysPressed.w = false;
       }
     });
 
     // Function to update player position continuously
     function update() {
+      // Determine horizontal movement based on active keys
+      if (keysPressed.a) {
+        speedX = -maxSpeed;
+      } else if (keysPressed.d) {
+        speedX = maxSpeed;
+      } else {
+        speedX = 0; // No movement if neither left nor right is pressed
+      }
+
+      // Determine vertical movement based on active keys
+      if (keysPressed.w) {
+        speedY -= 0.15; // Move up when 'w' is pressed
+      } else {
+        speedY = 0.5; // Slow downward movement otherwise
+      }
+
+      // Update player position based on speed
       playerPositionX += speedX;
       playerPositionY += speedY;
 
       // Apply the tilt effect based on horizontal speed
       if (speedX !== 0) {
         // Tilt in the direction of movement
-        tiltAmount = (Math.abs(speedX) / maxSpeed) * tiltSpeed; // Adjust tilt amount
+        tiltAmount = (Math.abs(speedX) / maxSpeed) * tiltSpeed;
         if (speedX < 0) {
-          player.style.transform = `translate(-50%, -50%) rotate(${-tiltAmount}deg)`; // Tilt right
+          player.style.transform = `translate(-50%, -50%) rotate(${tiltAmount}deg)`; // Tilt left when moving left
         } else {
-          player.style.transform = `translate(-50%, -50%) rotate(${tiltAmount}deg)`; // Tilt left
+          player.style.transform = `translate(-50%, -50%) rotate(${-tiltAmount}deg)`; // Tilt right when moving right
         }
       } else {
         player.style.transform = `translate(-50%, -50%)`; // Reset tilt when not moving
