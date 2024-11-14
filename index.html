@@ -77,12 +77,120 @@
       playerPositionX += speedX;
       playerPositionY += speedY;
 
-      // Apply the tilt effect based on horizontal speed
+      // Apply the reversed tilt effect based on horizontal speed
       if (speedX !== 0) {
         tiltAmount = (Math.abs(speedX) / maxSpeed) * tiltSpeed;
-        player.style.transform = `translate(-50%, -50%) rotate(${speedX < 0 ? tiltAmount : -tiltAmount}deg)`;
+        // Reverse tilt direction
+        player.style.transform = `translate(-50%, -50%) rotate(${speedX < 0 ? -tiltAmount : tiltAmount}deg)`;
       } else {
-        player.style.transform = `translate(-50%, -50%)`;
+        player.style.transform = `translate(-50%, -50%)`; // Reset tilt when not moving
+      }
+
+      player.style.left = `${playerPositionX}px`;
+      player.style.top = `${playerPositionY}px`;
+
+      // Keep the player within screen bounds (X-axis)
+      const playerWidth = player.offsetWidth;
+      if (playerPositionX < playerWidth / 2) playerPositionX = playerWidth / 2;
+      if (playerPositionX > window.innerWidth - playerWidth / 2) playerPositionX = window.innerWidth - playerWidth / 2;
+
+      // Keep the player within screen bounds (Y-axis)
+      if (playerPositionY < 0) playerPositionY = 0;
+      if (playerPositionY > window.innerHeight - player.offsetHeight) playerPositionY = window.innerHeight - player.offsetHeight;
+
+      requestAnimationFrame(update);
+    }
+
+    update(); // Start the animation loop
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Directional Car Game Kewl</title>
+  <style>
+    /* Game area */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      overflow: hidden;
+    }
+
+    #gameArea {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #222;
+    }
+
+    /* Rectangle car */
+    #player {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 15px;
+      height: 30px;
+      background-color: black;
+      transform: translate(-50%, -50%) rotate(0deg);
+      transition: transform 0.1s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div id="gameArea">
+    <div id="player"></div>
+  </div>
+
+  <script>
+    const player = document.getElementById("player");
+    let playerPositionX = window.innerWidth / 2;
+    let playerPositionY = window.innerHeight / 2;
+    let speedX = 0;
+    let speedY = 0.5;
+    const maxSpeed = 5;
+    const tiltSpeed = 5;
+    let tiltAmount = 0;
+
+    // Track key states
+    const keys = { w: false, a: false, d: false };
+
+    // Event listeners to update key states
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "a" || event.key === "A") keys.a = true;
+      if (event.key === "d" || event.key === "D") keys.d = true;
+      if (event.key === "w" || event.key === "W") keys.w = true;
+    });
+
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "a" || event.key === "A") keys.a = false;
+      if (event.key === "d" || event.key === "D") keys.d = false;
+      if (event.key === "w" || event.key === "W") keys.w = false;
+    });
+
+    // Function to update player position continuously
+    function update() {
+      // Update speed based on key states
+      speedX = (keys.a ? -maxSpeed : 0) + (keys.d ? maxSpeed : 0);
+      speedY = keys.w ? -0.15 : 0.5;
+
+      playerPositionX += speedX;
+      playerPositionY += speedY;
+
+      // Apply the reversed tilt effect based on horizontal speed
+      if (speedX !== 0) {
+        tiltAmount = (Math.abs(speedX) / maxSpeed) * tiltSpeed;
+        // Reverse tilt direction
+        player.style.transform = `translate(-50%, -50%) rotate(${speedX < 0 ? -tiltAmount : tiltAmount}deg)`;
+      } else {
+        player.style.transform = `translate(-50%, -50%)`; // Reset tilt when not moving
       }
 
       player.style.left = `${playerPositionX}px`;
