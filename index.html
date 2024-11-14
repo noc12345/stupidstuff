@@ -1,279 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RNG RPG</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin: 0;
-            padding: 10px;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            position: relative;
-            height: 100vh;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Directional Car Game Kewl</title>
+  <style>
+    /* Game area */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      overflow: hidden;
+    }
 
-        #money-display {
-            position: fixed;
-            right: 10px;
-            top: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #000;
-            padding: 10px;
-        }
+    #gameArea {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #222;
+    }
 
-        .button {
-            font-size: 16px;
-            padding: 10px;
-            background-color: white;
-            color: black;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-            margin-right: 10px; /* Space between buttons */
-        }
-
-        #inventory-button {
-            position: absolute;
-            left: 0;
-            top: 10px;
-            transition: left 0.3s ease;
-        }
-
-        #output-box {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 100px;
-            padding: 10px;
-            background-color: #fff;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            overflow-y: auto;
-            font-size: 14px;
-            color: #333;
-        }
-
-        #search-button {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-        }
-
-        #inventory-panel {
-            position: fixed;
-            top: 0;
-            left: -250px; /* Hidden off-screen initially */
-            width: 250px;
-            height: 100%;
-            background-color: white;
-            border-right: 2px solid #ccc;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow: hidden; /* Hide overflow for panel */
-            transition: left 0.3s ease;
-        }
-
-        #inventory-panel.open {
-            left: 0; /* Slide in when open */
-        }
-
-        #inventory-button.open {
-            left: 250px; /* Move button with panel when open */
-        }
-
-        .inventory-item {
-            padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .inventory-item.selected {
-            background-color: #cce5ff; /* Highlight selected item */
-        }
-
-        .inventory-item.common {
-            background-color: #e0f7fa; /* Light blue for common items */
-        }
-
-        .inventory-item.uncommon {
-            background-color: #ffeb3b; /* Yellow for uncommon items */
-        }
-
-        .inventory-item.rare {
-            background-color: #8bc34a; /* Green for rare items */
-        }
-
-        .inventory-item:last-child {
-            margin-bottom: 0;
-        }
-
-        #sell-button-container {
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            width: 100%;
-            padding: 10px;
-            background-color: #fff;
-            border-top: 2px solid #ccc;
-            box-sizing: border-box;
-            text-align: center;
-        }
-
-        #sell-button, #sell-all-button {
-            font-size: 16px;
-            padding: 10px;
-            background-color: white;
-            color: black;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px; /* Space between the buttons */
-        }
-
-        #inventory-items {
-            height: calc(100% - 80px); /* Subtract height of sell button container */
-            overflow-y: auto;
-            padding-bottom: 50px; /* Optional padding to give space for scroll */
-        }
-
-    </style>
+    /* Rectangle car */
+    #player {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 15px;
+      height: 30px;
+      background-color: black;
+      transform: translate(-50%, -50%) rotate(0deg);
+      transition: transform 0.1s ease-in-out;
+    }
+  </style>
 </head>
 <body>
-    <div id="inventory-panel">
-        <h2>Inventory</h2>
-        <div id="inventory-items">
-            <!-- Items will be added here -->
-        </div>
-        <div id="sell-button-container">
-            <button id="sell-button" class="button">Sell</button>
-            <button id="sell-all-button" class="button">Sell All</button>
-        </div>
-    </div>
-    <div id="inventory-button" class="button">Inventory &lt;</div>
-    <div id="money-display">$0</div>
-    <div id="output-box">Game output will appear here.</div>
-    <button id="search-button" class="button">Search</button>
+  <div id="gameArea">
+    <div id="player"></div>
+  </div>
 
-    <script>
-        let money = 0;
-        let selectedItem = null; // To store the selected item
-        const items = [
-            { name: "gold coin", price: 20, rarity: "common" },
-            { name: "silver coin", price: 10, rarity: "common" },
-            { name: "diamond", price: 100, rarity: "rare" },
-            { name: "rusty key", price: 5, rarity: "uncommon" },
-            { name: "ancient map", price: 50, rarity: "uncommon" }
-        ]; // List of items with their prices and rarities
-        const inventoryButton = document.getElementById("inventory-button");
-        const inventoryPanel = document.getElementById("inventory-panel");
-        const inventoryItemsContainer = document.getElementById("inventory-items");
+  <script>
+    const player = document.getElementById("player");
+    let playerPositionX = window.innerWidth / 2;
+    let playerPositionY = window.innerHeight / 2;
+    let speedX = 0;
+    let speedY = 0.5;
+    const maxSpeed = 5;
+    const tiltSpeed = 5;
+    let tiltAmount = 0;
 
-        function updateMoneyDisplay() {
-            document.getElementById("money-display").innerText = `$${money}`;
-        }
+    // Track key states
+    const keys = { w: false, a: false, d: false };
 
-        function searchForItem() {
-            const randomItem = items[Math.floor(Math.random() * items.length)];
-            document.getElementById("output-box").innerText = `You found a ${randomItem.name} (${randomItem.rarity} item)! (Worth $${randomItem.price})`;
+    // Event listeners to update key states
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "a" || event.key === "A") keys.a = true;
+      if (event.key === "d" || event.key === "D") keys.d = true;
+      if (event.key === "w" || event.key === "W") keys.w = true;
+    });
 
-            // Add the item to the inventory
-            addItemToInventory(randomItem);
-        }
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "a" || event.key === "A") keys.a = false;
+      if (event.key === "d" || event.key === "D") keys.d = false;
+      if (event.key === "w" || event.key === "W") keys.w = false;
+    });
 
-        function addItemToInventory(item) {
-            // Create a new button for the inventory item
-            const itemButton = document.createElement("button");
-            itemButton.classList.add("inventory-item", item.rarity); // Add rarity class to style the item
-            itemButton.innerText = `${item.name} (Worth $${item.price})`;
+    // Function to update player position continuously
+    function update() {
+      // Update speed based on key states
+      speedX = (keys.a ? -maxSpeed : 0) + (keys.d ? maxSpeed : 0);
+      speedY = keys.w ? -0.15 : 0.5;
 
-            // Add event listener to select the item when clicked
-            itemButton.addEventListener("click", function() {
-                selectItem(itemButton, item);
-            });
+      playerPositionX += speedX;
+      playerPositionY += speedY;
 
-            // Append the item button to the inventory panel
-            inventoryItemsContainer.appendChild(itemButton);
-        }
+      // Apply the tilt effect based on horizontal speed
+      if (speedX !== 0) {
+        tiltAmount = (Math.abs(speedX) / maxSpeed) * tiltSpeed;
+        player.style.transform = `translate(-50%, -50%) rotate(${speedX < 0 ? tiltAmount : -tiltAmount}deg)`;
+      } else {
+        player.style.transform = `translate(-50%, -50%)`;
+      }
 
-        function selectItem(button, item) {
-            // Remove the selected class from any previously selected item
-            if (selectedItem) {
-                selectedItem.classList.remove("selected");
-            }
+      player.style.left = `${playerPositionX}px`;
+      player.style.top = `${playerPositionY}px`;
 
-            // Add the selected class to the clicked item
-            button.classList.add("selected");
-            selectedItem = button; // Set the clicked button as the selected item
-            document.getElementById("output-box").innerText = `Selected: ${item.name} (Worth $${item.price}, Rarity: ${item.rarity})`;
-        }
+      // Keep the player within screen bounds (X-axis)
+      const playerWidth = player.offsetWidth;
+      if (playerPositionX < playerWidth / 2) playerPositionX = playerWidth / 2;
+      if (playerPositionX > window.innerWidth - playerWidth / 2) playerPositionX = window.innerWidth - playerWidth / 2;
 
-        function sellItem() {
-            if (selectedItem) {
-                // Get the price of the selected item
-                const itemPrice = selectedItem.innerText.split(' (Worth $')[1].split(')')[0];
+      // Keep the player within screen bounds (Y-axis)
+      if (playerPositionY < 0) playerPositionY = 0;
+      if (playerPositionY > window.innerHeight - player.offsetHeight) playerPositionY = window.innerHeight - player.offsetHeight;
 
-                // Add the price of the selected item to money
-                money += parseInt(itemPrice);
+      requestAnimationFrame(update);
+    }
 
-                // Remove the selected item from the inventory
-                inventoryItemsContainer.removeChild(selectedItem);
-                updateMoneyDisplay();
-                document.getElementById("output-box").innerText = `You sold the selected item for $${itemPrice}! You now have $${money}.`;
-
-                selectedItem = null; // Reset selected item
-            } else {
-                document.getElementById("output-box").innerText = `No item selected to sell.`;
-            }
-        }
-
-        function sellAllItems() {
-            const allItems = document.querySelectorAll(".inventory-item");
-            let totalSale = 0;
-
-            // Calculate total sale price
-            allItems.forEach(item => {
-                const itemPrice = item.innerText.split(' (Worth $')[1].split(')')[0];
-                totalSale += parseInt(itemPrice);
-            });
-
-            // Add the total sale price to the money
-            money += totalSale;
-
-            // Remove all items from the inventory
-            inventoryItemsContainer.innerHTML = "";
-            updateMoneyDisplay();
-
-            document.getElementById("output-box").innerText = `You sold all items for $${totalSale}! You now have $${money}.`;
-        }
-
-        function toggleInventory() {
-            inventoryPanel.classList.toggle("open");
-            inventoryButton.classList.toggle("open");
-        }
-
-        // Event listeners
-        inventoryButton.addEventListener("click", toggleInventory);
-        document.getElementById("search-button").addEventListener("click", searchForItem);
-        document.getElementById("sell-button").addEventListener("click", sellItem);
-        document.getElementById("sell-all-button").addEventListener("click", sellAllItems);
-
-        // Initial display update
-        updateMoneyDisplay();
-    </script>
+    update(); // Start the animation loop
+  </script>
 </body>
 </html>
